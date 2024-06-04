@@ -1,0 +1,42 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-13T06:56:45-07:00\n"
+"PO-Revision-Date: 2019-09-30T06:56:45-07:00\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "plugins.importexport.rsciexport.displayName"
+msgstr "RSCI XML Export Plugin"
+
+msgid "plugins.importexport.rsciexport.description"
+msgstr "Export article metadata in RSCI XML."
+
+msgid "plugins.importexport.rsciexport.export"
+msgstr "Export Data"
+
+msgid "plugins.importexport.rsciexport.export.issue"
+msgstr "Export Issue"
+
+msgid "plugins.importexport.rsciexport.selectIssue"
+msgstr "Select an Issue to export."
+
+msgid "plugins.importexport.rsciexport.settings.form.journalRSCITitleId"
+msgstr "Journal ID in RSCI"
+
+msgid "plugins.importexport.rsciexport.settings.form.exportSections"
+msgstr "Export section names."
+
+msgid "plugins.importexport.rsciexport.settings.form.exportArtTypeFromSectionAbbrev"
+msgstr "Export article type by section abbreviations. Abbreviations must match with article types declared by RSCI. If this option is disabled or types doesn't match, then the "RAR" type will be assigned to the articles."
+
+msgid "plugins.importexport.rsciexport.settings.form.docStartKey"
+msgstr "Start of article text"
+
+msgid "plugins.importexport.rsciexport.settings.form.docEndKey"
+msgstr "End of article text"

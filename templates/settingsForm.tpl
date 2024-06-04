@@ -1,5 +1,5 @@
 {**
- * plugins/importexport/resciexport/templates/settingsForm.tpl
+ * plugins/importexport/rsciexport/templates/settingsForm.tpl
  *
  * RSCI plugin settings
  *
@@ -16,6 +16,12 @@
 
     {fbvFormSection list="true"}
     {fbvElement type="text" id="journalRSCITitleId" value=$journalRSCITitleId label="plugins.importexport.rsciexport.settings.form.journalRSCITitleId"}
+    {/fbvFormSection}
+    {fbvFormSection list="true"}
+    {fbvElement type="text" id="docStartKey" value=$docStartKey label="plugins.importexport.rsciexport.settings.form.docStartKey"}
+    {/fbvFormSection}
+    {fbvFormSection list="true"}
+    {fbvElement type="text" id="docEndKey" value=$docEndKey label="plugins.importexport.rsciexport.settings.form.docEndKey"}
     {/fbvFormSection}
     {fbvFormSection list="true"}
     {fbvElement type="checkbox" id="exportSections" label="plugins.importexport.rsciexport.settings.form.exportSections" checked=$exportSections|compare:true}

@@ -1,14 +1,26 @@
 <?php
 
 /**
- * @file plugins/importexport/rsciexport/RSCIExportPlugin.inc.php
+ * @file plugins/importexport/rsciexport/RSCIExportPlugin.php
  * @class RSCIExportPlugin
  * @ingroup plugins_importexport_rsci
  *
  * @brief RSCI XML export plugin.
  */
+namespace APP\plugins\importexport\rsciexport;
 
-import('lib.pkp.classes.plugins.ImportExportPlugin');
+use APP\core\Application;
+use APP\facades\Repo;
+use APP\template\TemplateManager;
+use PKP\plugins\ImportExportPlugin;
+use APP\notification\NotificationManager;
+use PKP\core\JSONMessage;
+use PKP\db\DAORegistry;
+use PKP\file\FileManager;
+use APP\plugins\importexport\rsciexport\classes\form\RSCIExportSettingsForm;
+use PKP\submission\PKPSubmission;
+use PKP\config\Config;
+
 
 class RSCIExportPlugin extends ImportExportPlugin
 {
@@ -17,7 +29,7 @@ class RSCIExportPlugin extends ImportExportPlugin
      */
     public function register($category, $path, $mainContextId = null)
     {
-        $success = parent::register($category, $path, $mainContextId);
+        $success = parent::register($category, $path);
         $this->addLocaleData();
         return $success;
     }
@@ -54,6 +66,17 @@ class RSCIExportPlugin extends ImportExportPlugin
                         $issueId,
                         $request->getContext()
                     );
+                    if ($exportXml === null){
+                        $user = $request->getUser();
+                        $notificationManager = new NotificationManager();
+                        $notificationManager->createTrivialNotification(
+                            $user->getId(),
+                            NOTIFICATION_TYPE_ERROR,
+                            array('pluginName' => $this->getDisplayName(),
+                            'contents' => "Choose issue with articles"));
+                        $request->redirectUrl(str_replace("exportIssue", "", $request->getRequestPath()));
+                        break;
+                    }
                     $this->_uploadZip($issueId, $exportXml);
                     break;
                 }
@@ -69,14 +92,14 @@ class RSCIExportPlugin extends ImportExportPlugin
     function manage($args, $request) {
         $user = $request->getUser();
 
-        $this->import('classes.form.RSCIExportSettingsForm');
+        
         $settingsForm = new RSCIExportSettingsForm($this, $request->getContext()->getId());
         $notificationManager = new NotificationManager();
         switch ($request->getUserVar('verb')) {
             case 'save':
                 $settingsForm->readInputData();
                 if ($settingsForm->validate()) {
-                    $settingsForm->execute();
+                    $settingsForm->execute([]);
                     $notificationManager->createTrivialNotification($user->getId(), NOTIFICATION_TYPE_SUCCESS);
                     return new JSONMessage();
                 } else {
@@ -92,45 +115,33 @@ class RSCIExportPlugin extends ImportExportPlugin
     /**
      * Get the zip with XML for an issue.
      * @param $issueId int
-     * @param $context Context
      * @return string XML contents representing the supplied issue IDs.
      */
-    function exportIssue($issueId, $context)
+    function exportIssue($issueId)
     {
-        $issueDao = DAORegistry::getDAO('IssueDAO');
-        $issue = $issueDao->getById($issueId);
-        //$publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-        //$submissionIds = array();
-
-        //$publishedArticles = $publishedArticleDao->getPublishedArticles($issueId);
-        //foreach ($publishedArticles as $publishedArticle) {
-        //    $submissionIds[] = $publishedArticle->getId();
-        //}
-
-        //$submissionDao = Application::getSubmissionDAO();
+        $issue = Repo::issue()->get($issueId);
+        
         $xml = '';
         $filterDao = DAORegistry::getDAO('FilterDAO');
         $rsciExportFilters = $filterDao->getObjectsByGroup('issue=>rsci-xml');
         assert(count($rsciExportFilters) == 1); // Assert only a single serialization filter
         $exportFilter = array_shift($rsciExportFilters);
+        $context = Application::get()->getRequest()->getContext();
         $exportSettings = array ('isExportArtTypeFromSectionAbbrev' => $this->getSetting($context->getId(), 'exportArtTypeFromSectionAbbrev'),
                                     'isExportSections' => $this->getSetting($context->getId(), 'exportSections'),
-                                    'journalRSCITitleId' => $this->getSetting($context->getId(), 'journalRSCITitleId'));
+                                    'journalRSCITitleId' => $this->getSetting($context->getId(), 'journalRSCITitleId'),
+                                    'docStartKey' => $this->getSetting($context->getId(), 'docStartKey'),
+                                    'docEndKey' => $this->getSetting($context->getId(), 'docEndKey'));
         $exportFilter->SetExportSettings($exportSettings);
-        //$submissions = array();
-        //foreach ($submissionIds as $submissionId) {
-        //    $submission = $submissionDao->getById($submissionId, $context->getId());
-        //    if ($submission) $submissions[] = $submission;
-        //}
+
         libxml_use_internal_errors(true);
         $issueXml = $exportFilter->execute($issue, true);
-        $xml = $issueXml->saveXml();
-//        $errors = array_filter(libxml_get_errors(), function($a) {
-//            return $a->level == LIBXML_ERR_ERROR || $a->level == LIBXML_ERR_FATAL;
-//        });
-//        if (!empty($errors)) {
-//            $this->displayXMLValidationErrors($errors, $xml);
-//        }
+        if ($issueXml !== null)
+            $xml = $issueXml->saveXml();
+        else {
+            $xml = null;
+        }
+
         return $xml;
     }
 
@@ -140,55 +151,39 @@ class RSCIExportPlugin extends ImportExportPlugin
      */
     protected function _uploadZip($issueId, $xml)
     {
-        import('lib.pkp.classes.file.FileManager');
         $fileManager = new FileManager();
         $xmlFileName = $this->getExportPath() . 'Markup_unicode.xml';
         $fileManager->writeFile($xmlFileName, $xml);
 
-        $issueDao = DAORegistry::getDAO('IssueDAO');
-        $issue = $issueDao->getById($issueId);
-        $coverUrl = $issue->getLocalizedCoverImageUrl();
-        $coverUrlParts = explode('/', $coverUrl);
-        $coverName = end($coverUrlParts);
-        if ($coverUrl != "")
-            $fileManager->copyFile($coverUrl, $this->getExportPath() . $coverName);
+        $issue = Repo::issue()->get($issueId);
 
-        $request = Registry::get('request', false);
-        $context = $request->getContext();
-        $submissionsIterator = Services::get('submission')->getMany([
-            'contextId' => $context->getId(),
-            'issueId' => $issue->getId()
-        ]);
-        /** @var Submission[] $publiations */
-        $submissions = iterator_to_array($submissionsIterator);
-//        $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
-//        $articles = $publishedArticleDao->getPublishedArticles($issue->getId());
-        $articleGalleyDAO = DAORegistry::getDAO('ArticleGalleyDAO');
+        $articles = Repo::submission()->getCollector()
+            ->filterByContextIds([$issue->getData('journalId')])
+            ->filterByIssueIds([$issue->getId()])
+            ->filterByStatus([PKPSubmission::STATUS_PUBLISHED])
+            ->GetMany()->toArray();
 
-        foreach ($submissions as $submission)
+        foreach ($articles as $article)
         {
-            /** @var Publication $publication */
-            $publication = $submission->getCurrentPublication();
-            /** @var ArticleGalley $galley */
-            $galley = $articleGalleyDAO->getByPublicationId($publication->getId())->next();
-            if (isset($galley))
-            {
-                $fileName = $galley->getFile()->getName(AppLocale::getPrimaryLocale());
-                $articleFilePath = $galley->getFile()->getData('path');
-
-                if ($articleFilePath != "")
-                    $fileManager->copyFile($articleFilePath, $this->getExportPath() . explode(' ', $fileName)[1]);
-            }
+            $galleys = Repo::galley()->dao->getByPublicationId($article->getCurrentPublication()->getId());
+            $galley = array_shift($galleys);
+            if (empty($galley) || empty($galley->getFile()))
+                continue;
+            $articleFilePath = $galley->getFile()->getData('path');
+            $fileName = array_shift($galley->getFile()->getData('name'));
+            
+            copy(Config::getVar('files', 'files_dir') . '/' . $articleFilePath, $this->getExportPath() . $fileName);
         }
 
         // ZIP:
-        $zip = new ZipArchive();
+        
+        $zip = new \ZipArchive();
         $zipPath = $this->getExportPath().'issue-'.$issue->getNumber().'-'.$issue->getYear() . '.zip';
-        if ($zip->open($zipPath, ZipArchive::CREATE)!==TRUE) {
+        if ($zip->open($zipPath, \ZipArchive::CREATE)!==TRUE) {
             exit('Невозможно создать архив ZIP (' . $zipPath . '\n');
         }
         $filesToArchive = scandir($this->getExportPath());
-
+        
         foreach($filesToArchive as $file) {
             if (is_file($this->getExportPath(). $file)) {
                 $zip->addFile($this->getExportPath() . $file, basename($file));
@@ -214,7 +209,7 @@ class RSCIExportPlugin extends ImportExportPlugin
         if ($this->_generatedTempPath === '')
         {
             $exportPath = parent::getExportPath();
-            $journal = Registry::get('request', false)->getJournal();
+            $journal = Application::get()->getRequest()->getJournal();
             $this->_generatedTempPath =  $exportPath . $this->getPluginSettingsPrefix() . 'Temp-' . date('Ymd-His'). $journal->getId() . '/';
         }
         return $this->_generatedTempPath;

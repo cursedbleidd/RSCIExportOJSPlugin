@@ -1,17 +1,21 @@
 <?php
 
 /**
- * @file plugins/importexport/rsciexport/classes/form/RSCIExportSettingsForm.inc.php
+ * @file plugins/importexport/rsciexport/classes/form/rsciexportSettingsForm.php
  * @class RSCISettingsForm
  * @ingroup plugins_importexport_rsciexport
  *
  * @brief Form for journal managers to setup RSCI plugin
  */
 
+ namespace APP\plugins\importexport\rsciexport\classes\form;
 
-import('lib.pkp.classes.form.Form');
+ use PKP\form\Form;
+ use PKP\form\validation\FormValidatorPost;
+ use PKP\form\validation\FormValidatorCSRF;
 
-class RSCIExportSettingsForm extends Form {
+
+class RSCIexportSettingsForm extends Form {
 
     //
     // Private properties
@@ -44,7 +48,7 @@ class RSCIExportSettingsForm extends Form {
     //
     /**
      * Constructor
-     * @param $plugin RSCIExportPlugin
+     * @param $plugin RSCIexportPlugin
      * @param $contextId integer
      */
     function __construct($plugin, $contextId) {
@@ -104,7 +108,9 @@ class RSCIExportSettingsForm extends Form {
         return array(
             'exportSections' => 'bool',
             'exportArtTypeFromSectionAbbrev' => 'bool',
-            'journalRSCITitleId' => 'int'
+            'journalRSCITitleId' => 'int',
+            'docStartKey' => 'string',
+            'docEndKey' => 'string',
         );
     }
 }

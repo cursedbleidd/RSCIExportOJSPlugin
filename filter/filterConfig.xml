@@ -13,14 +13,14 @@
 			symbolic="issue=>rsci-xml"
 			displayName="plugins.importexport.rsciexport.displayName"
 			description="plugins.importexport.rsciexport.description"
-			inputType="class::classes.article.Issue"
+			inputType="class::classes.issue.Issue"
 			outputType="xml::dtd" />
 	</filterGroups>
 	<filters>
 		<!-- RSCI article output -->
 		<filter
 			inGroup="issue=>rsci-xml"
-			class="plugins.importexport.rsciexport.filter.ArticleRSCIXmlFilter"
+			class="APP\plugins\importexport\rsciexport\filter\ArticleRSCIXmlFilter"
 			isTemplate="0" />
 	</filters>
 </filterConfig>
