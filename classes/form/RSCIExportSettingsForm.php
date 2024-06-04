@@ -111,6 +111,7 @@ class RSCIexportSettingsForm extends Form {
             'journalRSCITitleId' => 'int',
             'docStartKey' => 'string',
             'docEndKey' => 'string',
+            'langCitation' => 'bool',
         );
     }
 }

@@ -40,3 +40,6 @@ msgstr "Начало текста статьи (включается в текс
 
 msgid "plugins.importexport.rsciexport.settings.form.docEndKey"
 msgstr "Конец текста статьи"
+
+msgid "plugins.importexport.rsciexport.settings.form.langCitation"
+msgstr "Экспортировать цитирования до '###'"

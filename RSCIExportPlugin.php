@@ -127,11 +127,14 @@ class RSCIExportPlugin extends ImportExportPlugin
         assert(count($rsciExportFilters) == 1); // Assert only a single serialization filter
         $exportFilter = array_shift($rsciExportFilters);
         $context = Application::get()->getRequest()->getContext();
-        $exportSettings = array ('isExportArtTypeFromSectionAbbrev' => $this->getSetting($context->getId(), 'exportArtTypeFromSectionAbbrev'),
-                                    'isExportSections' => $this->getSetting($context->getId(), 'exportSections'),
-                                    'journalRSCITitleId' => $this->getSetting($context->getId(), 'journalRSCITitleId'),
-                                    'docStartKey' => $this->getSetting($context->getId(), 'docStartKey'),
-                                    'docEndKey' => $this->getSetting($context->getId(), 'docEndKey'));
+        $exportSettings = array (
+            'isExportArtTypeFromSectionAbbrev' => $this->getSetting($context->getId(),'exportArtTypeFromSectionAbbrev'),
+            'isExportSections' => $this->getSetting($context->getId(), 'exportSections'),
+            'journalRSCITitleId' => $this->getSetting($context->getId(), 'journalRSCITitleId'),
+            'docStartKey' => $this->getSetting($context->getId(), 'docStartKey'),
+            'docEndKey' => $this->getSetting($context->getId(), 'docEndKey'),
+            'langCitation' => $this->getSetting($context->getId(), 'langCitation')
+        );
         $exportFilter->SetExportSettings($exportSettings);
 
         libxml_use_internal_errors(true);

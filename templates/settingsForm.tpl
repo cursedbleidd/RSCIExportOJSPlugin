@@ -29,6 +29,9 @@
     {fbvFormSection list="true"}
     {fbvElement type="checkbox" id="exportArtTypeFromSectionAbbrev" label="plugins.importexport.rsciexport.settings.form.exportArtTypeFromSectionAbbrev" checked=$exportArtTypeFromSectionAbbrev|compare:true}
     {/fbvFormSection}
+    {fbvFormSection list="true"}
+    {fbvElement type="checkbox" id="langCitation" label="plugins.importexport.rsciexport.settings.form.langCitation" checked=$langCitation|compare:true}
+    {/fbvFormSection}
     {/fbvFormArea}
     {fbvFormButtons submitText="common.save"}
 </form>

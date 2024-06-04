@@ -445,6 +445,8 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
 
         foreach ($citations as $citation)
         {
+            if ($this->_exportSettings['langCitation'] && $citation->getRawCitation() === "###")
+                break;
             $referenceNode = $doc->createElement('reference');
             $refInfoNode = $doc->createElement('refInfo');
             $refInfoNode->setAttribute('lang', $lang);

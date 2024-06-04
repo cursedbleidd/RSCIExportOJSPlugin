@@ -40,3 +40,6 @@ msgstr "Start of article text"
 
 msgid "plugins.importexport.rsciexport.settings.form.docEndKey"
 msgstr "End of article text"
+
+msgid "plugins.importexport.rsciexport.settings.form.langCitation"
+msgstr "Export citations before '###' citation"
