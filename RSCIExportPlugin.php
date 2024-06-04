@@ -169,9 +169,13 @@ class RSCIExportPlugin extends ImportExportPlugin
             $galley = array_shift($galleys);
             if (empty($galley) || empty($galley->getFile()))
                 continue;
+            $fileName = "";
             $articleFilePath = $galley->getFile()->getData('path');
-            $fileName = array_shift($galley->getFile()->getData('name'));
-            
+            foreach ($galley->getFile()->getData('name') as $filename)
+            {
+                if ($filename !== "")
+                    $fileName = $filename;
+            }
             copy(Config::getVar('files', 'files_dir') . '/' . $articleFilePath, $this->getExportPath() . $fileName);
         }
 

@@ -481,10 +481,18 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
         $filesNode = $doc->createElement('files');
 
         $galleys = Repo::galley()->dao->getByPublicationId($article->getCurrentPublication()->getId());
-        $galley = array_shift($galleys);
-        $file = $galley->getFile();
+        $pdfgalley = null;
+        $file = null;
+        foreach ($galleys as $galley)
+        {
+            if (strcmp($galley->getGalleyLabel(), "PDF") === 0){
+                $file = $galley->getFile();
+                $pdfgalley = $galley;
+                break;
+            }
+        }
 
-        if (empty($galley))
+        if (empty($pdfgalley))
             return "";
 
         $request = Application::get()->getRequest();
@@ -496,9 +504,16 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
         $filesNode->append($furlNode);
         if (!empty($file))
         {
-            $fileNode = $doc->createElement('file', array_shift($file->getData('name')));
-            $fileNode->setAttribute('desc', 'fullText');
-            $filesNode->append($fileNode);
+            foreach ($file->getData('name') as $filename)
+            {
+                if ($filename !== "")
+                {
+                    $fileNode = $doc->createElement('file', $filename);
+                    $fileNode->setAttribute('desc', 'fullText');
+                    $filesNode->append($fileNode);
+                    break;
+                }
+            }
         }
 
         return $filesNode;
@@ -508,6 +523,7 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
      * Converts galley filename to RSCI name format for archiving (example: "13-16.pdf").
      * @param $article Submission published
      * @return string
+     * @deprecated in 0.1.0.2
      */
     static public function getArticleFileNameToRSCI($article,  $issue)
     {
