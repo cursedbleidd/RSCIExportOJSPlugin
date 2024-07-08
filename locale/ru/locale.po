@@ -43,3 +43,6 @@ msgstr "Конец текста статьи"
 
 msgid "plugins.importexport.rsciexport.settings.form.langCitation"
 msgstr "Экспортировать цитирования до '###'"
+
+msgid "plugins.importexport.rsciexport.settings.form.namesAsIs"
+msgstr "Экспортировать инициалов (если в именах авторов уже стоят инициалы)"

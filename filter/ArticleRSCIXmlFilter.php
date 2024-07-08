@@ -308,7 +308,7 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
             $locale = $this->_convertISO639ToLocale($lang);
 
             $individInfoNode->append($doc->createElement('surname', $author->getFamilyName($locale)));
-            $individInfoNode->append($doc->createElement('initials', $this->_createInitials($author->getGivenName($locale))));
+            $individInfoNode->append($doc->createElement('initials', ($this->_exportSettings['namesAsIs']) ? $author->getGivenName($locale) : $this->_createInitials($author->getGivenName($locale))));
 
             $individInfoNode->append($doc->createElement('orgName', $author->getAffiliation($locale)));
             if($author->getEmail() != "null@null.null")
@@ -487,7 +487,7 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
         $file = null;
         foreach ($galleys as $galley)
         {
-            if (strcmp($galley->getGalleyLabel(), "PDF") === 0){
+            if (strcmp($galley->getGalleyLabel(), "PDF") === 0 || strcmp($galley->getGalleyLabel(), "pdf") === 0){
                 $file = $galley->getFile();
                 $pdfgalley = $galley;
                 break;
@@ -602,7 +602,6 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
     {
         $names = explode(' ', $givenName);
         $initialsArray = array();
-
         foreach ($names as $name)
         {
             $initial = mb_substr($name, 0, 1);
@@ -617,6 +616,7 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
         {
             $initials = $initials . $initial . '. ';
         }
+        var_dump($initialsArray);
         $initials = rtrim($initials, " ");
 
         return $initials;

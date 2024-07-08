@@ -112,6 +112,7 @@ class RSCIexportSettingsForm extends Form {
             'docStartKey' => 'string',
             'docEndKey' => 'string',
             'langCitation' => 'bool',
+            'namesAsIs' => 'bool',
         );
     }
 }

@@ -133,7 +133,8 @@ class RSCIExportPlugin extends ImportExportPlugin
             'journalRSCITitleId' => $this->getSetting($context->getId(), 'journalRSCITitleId'),
             'docStartKey' => $this->getSetting($context->getId(), 'docStartKey'),
             'docEndKey' => $this->getSetting($context->getId(), 'docEndKey'),
-            'langCitation' => $this->getSetting($context->getId(), 'langCitation')
+            'langCitation' => $this->getSetting($context->getId(), 'langCitation'),
+            'namesAsIs' => $this->getSetting($context->getId(), 'namesAsIs'),
         );
         $exportFilter->SetExportSettings($exportSettings);
 

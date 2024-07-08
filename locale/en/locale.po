@@ -43,3 +43,6 @@ msgstr "End of article text"
 
 msgid "plugins.importexport.rsciexport.settings.form.langCitation"
 msgstr "Export citations before '###' citation"
+
+msgid "plugins.importexport.rsciexport.settings.form.namesAsIs"
+msgstr "Export initials (in case authors names contain initials already)"
