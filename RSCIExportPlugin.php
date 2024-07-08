@@ -180,7 +180,7 @@ class RSCIExportPlugin extends ImportExportPlugin
                 if ($filename !== "")
                     $fileName = $filename;
             }
-            copy(Config::getVar('files', 'files_dir') . '/' . $articleFilePath, $this->getExportPath() . $fileName);
+            $fileManager->copyFile(Config::getVar('files', 'files_dir') . '/' . $articleFilePath, $this->getExportPath() . $fileName);
         }
 
         // ZIP:

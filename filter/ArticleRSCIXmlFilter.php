@@ -499,7 +499,7 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
 
         $request = Application::get()->getRequest();
         $context = $request->getContext();
-        $resourceURL = $request->url($context->getPath(), 'article', 'view', $article->getId() . "/". $galley->getId(), null, null, true);
+        $resourceURL = $request->url($context->getPath(), 'article', 'view', (empty($article->getCurrentPublication()->getData('urlPath'))) ? $article->getId() : $article->getCurrentPublication()->getData('urlPath'), null, null, true);
         $furlNode = $doc->createElement('furl', $resourceURL);
         $furlNode->setAttribute('location', 'publisher');
         $furlNode->setAttribute('version', 'published');
@@ -616,7 +616,6 @@ class ArticleRSCIXmlFilter extends PersistableFilter {
         {
             $initials = $initials . $initial . '. ';
         }
-        var_dump($initialsArray);
         $initials = rtrim($initials, " ");
 
         return $initials;
